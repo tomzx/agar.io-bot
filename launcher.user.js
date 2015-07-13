@@ -1,4 +1,4 @@
-VERSION = '0.1.0';
+VERSION = '0.1.1';
 
 Number.prototype.mod = function(n) {
 	return ((this % n) + n) % n;
@@ -524,30 +524,38 @@ console.log('Running tomzx Bot Launcher v' + VERSION + '!');
 		return (y - getHeight() / 2) / getRatio() + getY();;
 	}
 
-	window.drawPoint = function(x_1, y_1, drawColor, text) {
-		if (!toggleDraw) {
-			dPoints.push([x_1, y_1, drawColor]);
-			dText.push(text);
+	window.drawPoint = function(x, y, drawColor, text, size) {
+		if (toggleDraw) {
+			return
 		}
+
+		dPoints.push([x, y, drawColor, size]);
+		dText.push(text);
 	}
 
 	window.drawArc = function(x_1, y_1, x_2, y_2, x_3, y_3, drawColor) {
-		if (!toggleDraw) {
-			var radius = computeDistance(x_1, y_1, x_3, y_3);
-			dArc.push([x_1, y_1, x_2, y_2, x_3, y_3, radius, drawColor]);
+		if (toggleDraw) {
+			return;
 		}
+
+		var radius = computeDistance(x_1, y_1, x_3, y_3);
+		dArc.push([x_1, y_1, x_2, y_2, x_3, y_3, radius, drawColor]);
 	}
 
 	window.drawLine = function(x_1, y_1, x_2, y_2, drawColor) {
-		if (!toggleDraw) {
-			lines.push([x_1, y_1, x_2, y_2, drawColor]);
+		if (toggleDraw) {
+			return;
 		}
+
+		lines.push([x_1, y_1, x_2, y_2, drawColor]);
 	}
 
 	window.drawCircle = function(x_1, y_1, radius, drawColor) {
-		if (!toggleDraw) {
-			circles.push([x_1, y_1, radius, drawColor]);
+		if (toggleDraw) {
+			return;
 		}
+
+		circles.push([x_1, y_1, radius, drawColor]);
 	}
 
 	function V() {
@@ -707,7 +715,7 @@ console.log('Running tomzx Bot Launcher v' + VERSION + '!');
 
 		var displayText = 'Score: ' + ~~(R / 100) + " Current Time: " + nbSeconds + " seconds.";
 
-		0 != R && (null == ua && (ua = new va(24, "#FFFFFF")), ua.C(displayText), c = ua.L(), a = c.width, f.globalAlpha = .2, f.fillStyle = "#000000", f.fillRect(10, r - 10 - 24 - 10, a + 10, 34), f.globalAlpha = 1, f.drawImage(c, 15, r -
+		0 != R && (null == ua && (ua = new TextElement(24, "#FFFFFF")), ua.C(displayText), c = ua.L(), a = c.width, f.globalAlpha = .2, f.fillStyle = "#000000", f.fillRect(10, r - 10 - 24 - 10, a + 10, 34), f.globalAlpha = 1, f.drawImage(c, 15, r -
 			10 - 24 - 5));
 		Cb();
 		b = Date.now() - b;
@@ -850,7 +858,7 @@ console.log('Running tomzx Bot Launcher v' + VERSION + '!');
 				d.strokeStyle = '#003300';
 				d.stroke();
 			} else {
-				var text = new va(18, (getDarkBool() ? '#F2FBFF' : '#111111'), true, '#000000');
+				var text = new TextElement(dPoints[i][3] || 18, (getDarkBool() ? '#F2FBFF' : '#111111'));
 
 				text.C(dText[i]);
 				var textRender = text.L();
@@ -884,7 +892,7 @@ console.log('Running tomzx Bot Launcher v' + VERSION + '!');
 		}
 
 		var offsetValue = 20;
-		var text = new va(18, (getDarkBool() ? '#F2FBFF' : '#111111'));
+		var text = new TextElement(18, (getDarkBool() ? '#F2FBFF' : '#111111'));
 
 		for (var i = 0; i < debugStrings.length; i++) {
 			text.C(debugStrings[i]);
@@ -899,7 +907,7 @@ console.log('Running tomzx Bot Launcher v' + VERSION + '!');
 			var mHeight = 0;
 
 			for (var i = 0; i < message.length; i++) {
-				var mText = new va(28, '#FF0000', true, '#000000');
+				var mText = new TextElement(28, '#FF0000', true, '#000000');
 				mText.C(message[i]);
 				mRender.push(mText.L());
 
@@ -1008,11 +1016,11 @@ console.log('Running tomzx Bot Launcher v' + VERSION + '!');
 		this.B(p)
 	}
 
-	function va(a, b, c, d) {
-		a && (this.u = a);
-		b && (this.S = b);
-		this.U = !!c;
-		d && (this.v = d)
+	function TextElement(size, color, displayBorder, borderColor) {
+		size && (this.u = size);
+		color && (this.S = color);
+		this.U = displayBorder;
+		borderColor && (this.v = borderColor)
 	}
 
 	function S(a, b) {
@@ -1778,7 +1786,7 @@ console.log('Running tomzx Bot Launcher v' + VERSION + '!');
 					},
 					B: function(a) {
 						if (this.name = a) null ==
-							this.o ? this.o = new va(this.l(), "#FFFFFF", !0, "#000000") : this.o.M(this.l()), this.o.C(this.name)
+							this.o ? this.o = new TextElement(this.l(), "#FFFFFF", !0, "#000000") : this.o.M(this.l()), this.o.C(this.name)
 					},
 					W: function() {
 						for (var a = this.I(); this.a.length > a;) {
@@ -1907,13 +1915,13 @@ console.log('Running tomzx Bot Launcher v' + VERSION + '!');
 								a.drawImage(e, ~~this.x - ~~(p / 2), b - ~~(g / 2), p, g);
 								b += e.height / 2 / d + 4
 							}
-							0 < this.id && lb && (c || 0 == k.length && (!this.h || this.n) && 20 < this.size) && (null == this.O && (this.O = new va(this.l() / 2, "#FFFFFF", !0, "#000000")), c = this.O, c.M(this.l() / 2), c.C(~~(this.size * this.size / 100)), d = Math.ceil(10 * h) / 10, c.ea(d), e = c.L(), p = ~~(e.width / d), g = ~~(e.height / d), a.drawImage(e, ~~this.x - ~~(p / 2),
+							0 < this.id && lb && (c || 0 == k.length && (!this.h || this.n) && 20 < this.size) && (null == this.O && (this.O = new TextElement(this.l() / 2, "#FFFFFF", !0, "#000000")), c = this.O, c.M(this.l() / 2), c.C(~~(this.size * this.size / 100)), d = Math.ceil(10 * h) / 10, c.ea(d), e = c.L(), p = ~~(e.width / d), g = ~~(e.height / d), a.drawImage(e, ~~this.x - ~~(p / 2),
 								b - ~~(g / 2), p, g));
 							a.restore()
 						}
 					}
 				};
-				va.prototype = {
+				TextElement.prototype = {
 					F: "",
 					S: "#000000",
 					U: !1,
@@ -2200,4 +2208,4 @@ console.log('Running tomzx Bot Launcher v' + VERSION + '!');
 			}
 		}
 	}
-})(window, window.jQuery);
+})(window, jQuery);

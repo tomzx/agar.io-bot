@@ -6,7 +6,7 @@
 //      Better wall code
 //      In team mode, make allies be obstacles.
 
-var VERSION = '0.1.1';
+var VERSION = '0.1.2';
 
 Number.prototype.mod = function(n) {
 	return ((this % n) + n) % n;
@@ -17,20 +17,20 @@ Array.prototype.peek = function() {
 };
 
 console.log('Running tomzx Bot v' + VERSION + '!');
-(function(f, g) {
+(function(global, jQuery) {
 	var splitDistance = 710;
 	console.log("tomzx Bot!");
 
-	if (f.botList == null) {
-		f.botList = [];
-		g('#locationUnknown').append(g('<select id="bList" class="form-control" onchange="setBotIndex($(this).val());" />'));
-		g('#locationUnknown').addClass('form-group');
+	if (global.botList == null) {
+		global.botList = [];
+		jQuery('#locationUnknown').append(jQuery('<select id="bList" class="form-control" onchange="setBotIndex($(this).val());" />'));
+		jQuery('#locationUnknown').addClass('form-group');
 	}
 
-	f.botList.push(["TomzxBot " + VERSION, findDestination]);
+	global.botList.push(["TomzxBot " + VERSION, findDestination]);
 
-	var bList = g('#bList');
-	g('<option />', {value: (f.botList.length - 1), text: "TomzxBot"}).appendTo(bList);
+	var bList = jQuery('#bList');
+	jQuery('<option />', {value: (global.botList.length - 1), text: "TomzxBot"}).appendTo(bList);
 
 	//Given an angle value that was gotten from valueAndleBased(),
 	//returns a new value that scales it appropriately.
@@ -87,7 +87,6 @@ console.log('Running tomzx Bot v' + VERSION + '!');
 
 		return dotList;
 	}
-
 
 	function compareSize(player1, player2, ratio) {
 		if (player1.size * player1.size * ratio < player2.size * player2.size) {
@@ -486,7 +485,7 @@ console.log('Running tomzx Bot v' + VERSION + '!');
 	}
 
 	function addWall(listToUse, blob) {
-		if (blob.x < f.getMapStartX() + 1000) {
+		if (blob.x < global.getMapStartX() + 1000) {
 			//LEFT
 			//console.log("Left");
 
@@ -498,7 +497,7 @@ console.log('Running tomzx Bot v' + VERSION + '!');
 			drawLine(blob.x, blob.y, lineRight[0], lineRight[1], 5);
 			drawArc(lineLeft[0], lineLeft[1], lineRight[0], lineRight[1], blob.x, blob.y, 5);
 		}
-		if (blob.y < f.getMapStartY() + 1000) {
+		if (blob.y < global.getMapStartY() + 1000) {
 			//TOP
 			//console.log("TOP");
 
@@ -510,7 +509,7 @@ console.log('Running tomzx Bot v' + VERSION + '!');
 			drawLine(blob.x, blob.y, lineRight[0], lineRight[1], 5);
 			drawArc(lineLeft[0], lineLeft[1], lineRight[0], lineRight[1], blob.x, blob.y, 5);
 		}
-		if (blob.x > f.getMapEndX() - 1000) {
+		if (blob.x > global.getMapEndX() - 1000) {
 			//RIGHT
 			//console.log("RIGHT");
 
@@ -522,7 +521,7 @@ console.log('Running tomzx Bot v' + VERSION + '!');
 			drawLine(blob.x, blob.y, lineRight[0], lineRight[1], 5);
 			drawArc(lineLeft[0], lineLeft[1], lineRight[0], lineRight[1], blob.x, blob.y, 5);
 		}
-		if (blob.y > f.getMapEndY() - 1000) {
+		if (blob.y > global.getMapEndY() - 1000) {
 			//BOTTOM
 			//console.log("BOTTOM");
 
@@ -753,7 +752,7 @@ console.log('Running tomzx Bot v' + VERSION + '!');
 					drawCircle(currentThreat.x, currentThreat.y, normalDangerDistance + shiftDistance, 6);
 				}
 
-				if (currentThreat.danger && f.getLastUpdate() - currentThreat.dangerTimeOut > 1000) {
+				if (currentThreat.danger && global.getLastUpdate() - currentThreat.dangerTimeOut > 1000) {
 					currentThreat.danger = false;
 				}
 
@@ -761,7 +760,7 @@ console.log('Running tomzx Bot v' + VERSION + '!');
 					(!enemyCanSplit && enemyDistance < normalDangerDistance)) {
 
 					currentThreat.danger = true;
-					currentThreat.dangerTimeOut = f.getLastUpdate();
+					currentThreat.dangerTimeOut = global.getLastUpdate();
 				}*/
 
 				//console.log("Figured out who was important.");
@@ -822,7 +821,7 @@ console.log('Running tomzx Bot v' + VERSION + '!');
 			//stupidList.push([[45, true], [135, false]]);
 			//stupidList.push([[10, true], [200, false]]);
 
-			//console.log("Added random noob stuff.");
+			//console.log("Added random noob stufglobal.");
 
 			var sortedInterList = [];
 			var sortedObList = [];
@@ -925,7 +924,7 @@ console.log('Running tomzx Bot v' + VERSION + '!');
 
 				perfectAngle = shiftAngle(obstacleAngles, perfectAngle, bIndex);
 
-				var line1 = followAngle(perfectAngle, currentPlayer.x, currentPlayer.y, f.verticalDistance());
+				var line1 = followAngle(perfectAngle, currentPlayer.x, currentPlayer.y, global.verticalDistance());
 
 				destinationChoices.push([line1, currentPlayer.size, true]);
 				drawLine(currentPlayer.x, currentPlayer.y, line1[0], line1[1], 7);
@@ -949,6 +948,7 @@ console.log('Running tomzx Bot v' + VERSION + '!');
 					clusterAllFood[i][3] = clusterAngle;
 
 					drawPoint(clusterAllFood[i][0], clusterAllFood[i][1], 1, "");
+					drawPoint(clusterAllFood[i][0], clusterAllFood[i][1], 1, Math.round(clusterAllFood[i][2], 2));
 					//console.log("After: " + clusterAllFood[i][2]);
 				}
 
@@ -1027,100 +1027,100 @@ console.log('Running tomzx Bot v' + VERSION + '!');
 		return (y - getHeight() / 2) / getRatio() + getY();;
 	}
 
-	function drawPoint(x_1, y_1, drawColor, text) {
-		f.drawPoint(x_1, y_1, drawColor, text);
+	function drawPoint(x, y, drawColor, text, size) {
+		global.drawPoint(x, y, drawColor, text, size);
 	}
 
 	function drawArc(x_1, y_1, x_2, y_2, x_3, y_3, drawColor) {
-		f.drawArc(x_1, y_1, x_2, y_2, x_3, y_3, drawColor);
+		global.drawArc(x_1, y_1, x_2, y_2, x_3, y_3, drawColor);
 	}
 
 	function drawLine(x_1, y_1, x_2, y_2, drawColor) {
-		f.drawLine(x_1, y_1, x_2, y_2, drawColor);
+		global.drawLine(x_1, y_1, x_2, y_2, drawColor);
 	}
 
 	function drawCircle(x_1, y_1, radius, drawColor) {
-		f.drawCircle(x_1, y_1, radius, drawColor);
+		global.drawCircle(x_1, y_1, radius, drawColor);
 	}
 
 	function screenDistance() {
-		var temp = f.getScreenDistance();
+		var temp = global.getScreenDistance();
 		return temp;
 	}
 
 	function getDarkBool() {
-		return f.getDarkBool();
+		return global.getDarkBool();
 	}
 
 	function getMassBool() {
-		return f.getMassBool();
+		return global.getMassBool();
 	}
 
 	function getMemoryCells() {
-		return f.getMemoryCells();
+		return global.getMemoryCells();
 	}
 
 	function getCellsArray() {
-		return f.getCellsArray();
+		return global.getCellsArray();
 	}
 
 	function getCells() {
-		return f.getCells();
+		return global.getCells();
 	}
 
 	function getPlayer() {
-		return f.getPlayer();
+		return global.getPlayer();
 	}
 
 	function getWidth() {
-		return f.getWidth();
+		return global.getWidth();
 	}
 
 	function getHeight() {
-		return f.getHeight();
+		return global.getHeight();
 	}
 
 	function getRatio() {
-		return f.getRatio();
+		return global.getRatio();
 	}
 
 	function getOffsetX() {
-		return f.getOffsetX();
+		return global.getOffsetX();
 	}
 
 	function getOffsetY() {
-		return f.getOffsetY();
+		return global.getOffsetY();
 	}
 
 	function getX() {
-		return f.getX();
+		return global.getX();
 	}
 
 	function getY() {
-		return f.getY();
+		return global.getY();
 	}
 
 	function getPointX() {
-		return f.getPointX();
+		return global.getPointX();
 	}
 
 	function getPointY() {
-		return f.getPointY();
+		return global.getPointY();
 	}
 
 	function getMouseX() {
-		return f.getMouseX();
+		return global.getMouseX();
 	}
 
 	function getMouseY() {
-		return f.getMouseY();
+		return global.getMouseY();
 	}
 
 	function getUpdate() {
-		return f.getLastUpdate();
+		return global.getLastUpdate();
 	}
 
 	function getMode() {
-		return f.getMode();
+		return global.getMode();
 	}
 })(window, jQuery);
