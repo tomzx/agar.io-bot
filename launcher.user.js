@@ -1,4 +1,4 @@
-VERSION = '0.1.1';
+VERSION = '0.1.2';
 
 Number.prototype.mod = function(n) {
 	return ((this % n) + n) % n;
@@ -572,8 +572,7 @@ console.log('Running tomzx Bot Launcher v' + VERSION + '!');
 		} else if (getPlayer().length > 0 && reviving) {
 			reviving = false;
 		}
-		
-		
+
 		var a;
 		if (T()) {
 			a = fa - m / 2;
@@ -888,7 +887,9 @@ console.log('Running tomzx Bot Launcher v' + VERSION + '!');
 		if (getPlayer().length > 0) {
 			var offsetX = -getMapStartX();
 			var offsetY = -getMapStartY();
-			debugStrings.push("Location: " + Math.floor(getPlayer()[0].x + offsetX) + ", " + Math.floor(getPlayer()[0].y + offsetY));
+			var player = getPlayer()[0];
+			debugStrings.push("Location: " + Math.floor(player.x + offsetX) + ", " + Math.floor(player.y + offsetY));
+			debugStrings.push("State: " + player.state)
 		}
 
 		var offsetValue = 20;

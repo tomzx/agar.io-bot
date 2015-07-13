@@ -6,7 +6,7 @@
 //      Better wall code
 //      In team mode, make allies be obstacles.
 
-var VERSION = '0.1.2';
+var VERSION = '0.1.3';
 
 Number.prototype.mod = function(n) {
 	return ((this % n) + n) % n;
@@ -899,6 +899,7 @@ console.log('Running tomzx Bot v' + VERSION + '!');
 			}
 
 			if (followMouse && goodAngles.length === 0) {
+				currentPlayer.state = 'follow mouse';
 				//This is the follow the mouse mode
 				var distance = computeDistance(currentPlayer.x, currentPlayer.y, tempPoint[0], tempPoint[1]);
 
@@ -911,6 +912,7 @@ console.log('Running tomzx Bot v' + VERSION + '!');
 				//tempMoveX = destination[0];
 				//tempMoveY = destination[1];
 			} else if (goodAngles.length > 0) {
+				currentPlayer.state = 'good angle';
 				var bIndex = goodAngles[0];
 				var biggest = goodAngles[0][1];
 				for (var i = 1; i < goodAngles.length; i++) {
@@ -934,6 +936,7 @@ console.log('Running tomzx Bot v' + VERSION + '!');
 				//TODO: CODE TO HANDLE WHEN THERE IS NO GOOD ANGLE BUT THERE ARE ENEMIES AROUND!!!!!!!!!!!!!
 				destinationChoices.push([[tempMoveX, tempMoveY], currentPlayer.size, false]);
 			} else if (clusterAllFood.length > 0) {
+				currentPlayer.state = 'eat food';
 				for (var i = 0; i < clusterAllFood.length; i++) {
 					//console.log("mefore: " + clusterAllFood[i][2]);
 					//This is the cost function. Higher is better.
@@ -974,6 +977,7 @@ console.log('Running tomzx Bot v' + VERSION + '!');
 				//tempMoveY = destination[1];
 				drawLine(currentPlayer.x, currentPlayer.y, destination[0], destination[1], 1);
 			} else {
+				currentPlayer.state = 'random';
 				//If there are no enemies around and no food to eat.
 				destinationChoices.push([[tempMoveX, tempMoveY], currentPlayer.size, false]);
 			}
