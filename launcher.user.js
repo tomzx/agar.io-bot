@@ -889,7 +889,7 @@ console.log('Running tomzx Bot Launcher v' + VERSION + '!');
 			var offsetY = -getMapStartY();
 			var player = getPlayer()[0];
 			debugStrings.push("Location: " + Math.floor(player.x + offsetX) + ", " + Math.floor(player.y + offsetY));
-			debugStrings.push("State: " + player.state)
+			debugStrings.push("State: " + player.state);
 		}
 
 		var offsetValue = 20;

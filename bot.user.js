@@ -6,7 +6,7 @@
 //      Better wall code
 //      In team mode, make allies be obstacles.
 
-var VERSION = '0.1.3';
+var VERSION = '0.2.0';
 
 Number.prototype.mod = function(n) {
 	return ((this % n) + n) % n;
@@ -76,11 +76,11 @@ console.log('Running tomzx Bot v' + VERSION + '!');
 		return computeDistance(x1, y1, offsetX, offsetY);
 	}
 
-	function getListBasedOnFunction(booleanFunction, listToUse) {
+	function getListBasedOnFunction(predicate, list) {
 		var dotList = [];
 		var interNodes = getMemoryCells();
-		Object.keys(listToUse).forEach(function(element, index) {
-			if (booleanFunction(element)) {
+		Object.keys(list).forEach(function(element, index) {
+			if (predicate(element)) {
 				dotList.push(interNodes[element]);
 			}
 		});
@@ -221,7 +221,7 @@ console.log('Running tomzx Bot v' + VERSION + '!');
 		var player = getPlayer();
 		var interNodes = getMemoryCells();
 
-		elementList = getListBasedOnFunction(function(element) {
+		return getListBasedOnFunction(function(element) {
 			var isMe = isItMe(player, interNodes[element]);
 
 			if (!isMe && !interNodes[element].isVirus() && compareSize(interNodes[element], blob, 1.30) || (interNodes[element].size <= 11)) {
@@ -230,12 +230,6 @@ console.log('Running tomzx Bot v' + VERSION + '!');
 				return false;
 			}
 		}, interNodes);
-
-		for (var i = 0; i < elementList.length; i++) {
-			dotList.push([elementList[i].x, elementList[i].y, elementList[i].size]);
-		}
-
-		return dotList;
 	}
 
 	function clusterFood(foodList, blobSize) {
@@ -248,19 +242,25 @@ console.log('Running tomzx Bot v' + VERSION + '!');
 		//4: Angle, not set here.
 
 		for (var i = 0; i < foodList.length; i++) {
+			addedCluster = false;
 			for (var j = 0; j < clusters.length; j++) {
-				if (computeDistance(foodList[i][0], foodList[i][1], clusters[j][0], clusters[j][1]) < blobSize * 1.5) {
-					clusters[j][0] = (foodList[i][0] + clusters[j][0]) / 2;
-					clusters[j][1] = (foodList[i][1] + clusters[j][1]) / 2;
-					clusters[j][2] += foodList[i][2];
+				if (computeDistance(foodList[i].x, foodList[i].y, clusters[j].x, clusters[j].y) < blobSize * 1.5) {
+					clusters[j] = clusters[j] || {};
+					clusters[j].x = (foodList[i].x + clusters[j].x) / 2;
+					clusters[j].y = (foodList[i].y + clusters[j].y) / 2;
+					clusters[j].size += foodList[i].size;
 					addedCluster = true;
 					break;
 				}
 			}
 			if (!addedCluster) {
-				clusters.push([foodList[i][0], foodList[i][1], foodList[i][2], 0]);
+				clusters.push({
+					x: foodList[i].x,
+					y: foodList[i].y,
+					size: foodList[i].size,
+					value: 0
+				});
 			}
-			addedCluster = false;
 		}
 		return clusters;
 	}
@@ -737,7 +737,7 @@ console.log('Running tomzx Bot v' + VERSION + '!');
 
 				for (var j = clusterAllFood.length - 1; j >= 0 ; j--) {
 					var secureDistance = (enemyCanSplit ? splitDangerDistance : normalDangerDistance);
-					if (computeDistance(currentThreat.x, currentThreat.y, clusterAllFood[j][0], clusterAllFood[j][1]) < secureDistance) {
+					if (computeDistance(currentThreat.x, currentThreat.y, clusterAllFood[j].x, clusterAllFood[j].y) < secureDistance) {
 						clusterAllFood.splice(j, 1);
 					}
 				}
@@ -938,37 +938,37 @@ console.log('Running tomzx Bot v' + VERSION + '!');
 			} else if (clusterAllFood.length > 0) {
 				currentPlayer.state = 'eat food';
 				for (var i = 0; i < clusterAllFood.length; i++) {
-					//console.log("mefore: " + clusterAllFood[i][2]);
+					//console.log("mefore: " + clusterAllFood[i].size);
 					//This is the cost function. Higher is better.
 
-					var clusterAngle = getAngle(clusterAllFood[i][0], clusterAllFood[i][1], currentPlayer.x, currentPlayer.y);
+					var clusterAngle = getAngle(clusterAllFood[i].x, clusterAllFood[i].y, currentPlayer.x, currentPlayer.y);
 
-					clusterAllFood[i][2] = clusterAllFood[i][2] * 6 - computeDistance(clusterAllFood[i][0], clusterAllFood[i][1], currentPlayer.x, currentPlayer.y);
-					//console.log("Current Value: " + clusterAllFood[i][2]);
+					clusterAllFood[i].size = clusterAllFood[i].size * 6 - computeDistance(clusterAllFood[i].x, clusterAllFood[i].y, currentPlayer.x, currentPlayer.y);
+					//console.log("Current Value: " + clusterAllFood[i].size);
 
 					//(goodAngles[bIndex][1] / 2 - (Math.abs(perfectAngle - clusterAngle)));
 
-					clusterAllFood[i][3] = clusterAngle;
+					clusterAllFood[i].angle = clusterAngle;
 
-					drawPoint(clusterAllFood[i][0], clusterAllFood[i][1], 1, "");
-					drawPoint(clusterAllFood[i][0], clusterAllFood[i][1], 1, Math.round(clusterAllFood[i][2], 2));
-					//console.log("After: " + clusterAllFood[i][2]);
+					drawPoint(clusterAllFood[i].x, clusterAllFood[i].y, 1, "");
+					drawPoint(clusterAllFood[i].x, clusterAllFood[i].y, 1, Math.round(clusterAllFood[i].size, 2));
+					//console.log("After: " + clusterAllFood[i].size);
 				}
 
 				var bestFoodI = 0;
-				var bestFood = clusterAllFood[0][2];
+				var bestFood = clusterAllFood[0].size;
 				for (var i = 1; i < clusterAllFood.length; i++) {
-					if (bestFood < clusterAllFood[i][2]) {
-						bestFood = clusterAllFood[i][2];
+					if (bestFood < clusterAllFood[i].size) {
+						bestFood = clusterAllFood[i].size;
 						bestFoodI = i;
 					}
 				}
 
-				//console.log("Best Value: " + clusterAllFood[bestFoodI][2]);
+				//console.log("Best Value: " + clusterAllFood[bestFoodI].size);
 
-				var distance = computeDistance(currentPlayer.x, currentPlayer.y, clusterAllFood[bestFoodI][0], clusterAllFood[bestFoodI][1]);
+				var distance = computeDistance(currentPlayer.x, currentPlayer.y, clusterAllFood[bestFoodI].x, clusterAllFood[bestFoodI].y);
 
-				var shiftedAngle = shiftAngle(obstacleAngles, getAngle(clusterAllFood[bestFoodI][0], clusterAllFood[bestFoodI][1], currentPlayer.x, currentPlayer.y), [0, 360]);
+				var shiftedAngle = shiftAngle(obstacleAngles, getAngle(clusterAllFood[bestFoodI].x, clusterAllFood[bestFoodI].y, currentPlayer.x, currentPlayer.y), [0, 360]);
 
 				var destination = followAngle(shiftedAngle, currentPlayer.x, currentPlayer.y, distance);
 
