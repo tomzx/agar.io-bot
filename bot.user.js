@@ -6,7 +6,7 @@
 //      Better wall code
 //      In team mode, make allies be obstacles.
 
-var VERSION = '0.2.0';
+var VERSION = '0.2.1';
 
 Number.prototype.mod = function(n) {
 	return ((this % n) + n) % n;
@@ -76,7 +76,7 @@ console.log('Running tomzx Bot v' + VERSION + '!');
 		return computeDistance(x1, y1, offsetX, offsetY);
 	}
 
-	function getListBasedOnFunction(predicate, list) {
+	function filterCells(predicate, list) {
 		var dotList = [];
 		var interNodes = getMemoryCells();
 		Object.keys(list).forEach(function(element, index) {
@@ -110,7 +110,7 @@ console.log('Running tomzx Bot v' + VERSION + '!');
 		var player = getPlayer();
 		var interNodes = getMemoryCells();
 
-		dotList = getListBasedOnFunction(function(element) {
+		dotList = filterCells(function(element) {
 			var isMe = false;
 
 			for (var i = 0; i < player.length; i++) {
@@ -136,7 +136,7 @@ console.log('Running tomzx Bot v' + VERSION + '!');
 		var player = getPlayer();
 		var interNodes = getMemoryCells();
 
-		dotList = getListBasedOnFunction(function(element) {
+		dotList = filterCells(function(element) {
 			var isMe = false;
 
 			for (var i = 0; i < player.length; i++) {
@@ -203,7 +203,7 @@ console.log('Running tomzx Bot v' + VERSION + '!');
 		var player = getPlayer();
 		var interNodes = getMemoryCells();
 
-		dotList = getListBasedOnFunction(function(element) {
+		dotList = filterCells(function(element) {
 			var isMe = isItMe(player, interNodes[element]);
 
 			if (!isMe && (!interNodes[element].isVirus() && compareSize(blob, interNodes[element], 1.30))) {
@@ -221,14 +221,31 @@ console.log('Running tomzx Bot v' + VERSION + '!');
 		var player = getPlayer();
 		var interNodes = getMemoryCells();
 
-		return getListBasedOnFunction(function(element) {
+		return filterCells(function(element) {
 			var isMe = isItMe(player, interNodes[element]);
 
-			if (!isMe && !interNodes[element].isVirus() && compareSize(interNodes[element], blob, 1.30) || (interNodes[element].size <= 11)) {
-				return true;
-			} else {
+			if (isMe) {
 				return false;
 			}
+
+			if (interNodes[element].isFood()) {
+				return true;
+			}
+
+			if (interNodes[element].isVirus()) {
+				return false;
+			}
+
+			if (interNodes[element].isPlayer()) {
+				// Ignore players for now
+				return false;
+			}
+
+			if (compareSize(interNodes[element], blob, 1.30)) {
+				return true;
+			}
+
+			return false;
 		}, interNodes);
 	}
 

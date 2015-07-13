@@ -1,4 +1,4 @@
-VERSION = '0.1.2';
+VERSION = '0.1.3';
 
 Number.prototype.mod = function(n) {
 	return ((this % n) + n) % n;
@@ -1739,7 +1739,7 @@ console.log('Running tomzx Bot Launcher v' + VERSION + '!');
 					id: 0,
 					a: null,
 					name: null,
-					o: null,    
+					o: null,
 					O: null,
 					x: 0,
 					y: 0,
@@ -1766,9 +1766,15 @@ console.log('Running tomzx Bot Launcher v' + VERSION + '!');
 					isVirus: function() {
 						return this.h;
 					},
+					isPlayer: function() {
+						return this.name !== '' && this.size > 12;
+					},
+					isFood: function() {
+						return this.size < 12;
+					},
 					getUptimeTime: function() {
 						return this.Q;
-					}, 
+					},
 					X: function() {
 						var a;
 						for (a = 0; a < v.length; a++)
