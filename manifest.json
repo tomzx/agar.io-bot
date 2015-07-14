@@ -3,7 +3,7 @@
 
 	"name": "tomzx Agar.io Bot",
 	"description": "An Agar.io bot written in Javascript",
-	"version": "0.0.4",
+	"version": "0.2.0",
 	"author": "Tom Rochette <tom@tomrochette.com>",
 	"homepage_url": "http://www.tomrochette.com",
 
@@ -12,8 +12,10 @@
 	"content_scripts": [{
 		"js": [
 			"jquery-2.1.4.min.js",
-			"launcher.user.js",
-			"bot.user.js"
+			"game.js",
+			"core.js",
+			"launcher.js",
+			"bot.js"
 		],
 		"matches": [
 			"http://agar.io/*",

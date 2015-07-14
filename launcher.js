@@ -1,15 +1,9 @@
-VERSION = '0.1.3';
+var LAUNCHER = (function(d, e) {
+	VERSION = '0.2.0';
 
-Number.prototype.mod = function(n) {
-	return ((this % n) + n) % n;
-};
+	var module = {};
 
-Array.prototype.peek = function() {
-	return this[this.length - 1];
-}
-
-console.log('Running tomzx Bot Launcher v' + VERSION + '!');
-(function(d, e) {
+	console.log('Running tomzx Bot Launcher v' + VERSION + '!');
 
 	//UPDATE
 	function keyAction(e) {
@@ -27,19 +21,13 @@ console.log('Running tomzx Bot Launcher v' + VERSION + '!');
 		if (70 == e.keyCode) {
 			window.setShowMass(!getMassBool());
 		}
-		if (69 == e.keyCode) {
-			if (message.length > 0) {
-				window.setMessage([]);
-				window.onmouseup = function() {};
-				window.ignoreStream = true;
-			} else {
-				window.ignoreStream = false;
-				window.refreshTwitch();
-			}
-		}
 		if (81 == e.keyCode) {
 			console.log("ToggleFollowMouse");
 			toggleFollow = !toggleFollow;
+		}
+		if (83 == e.keyCode) {
+			console.log("toggleAllowSplitting");
+			toggleAllowSplitting = !toggleAllowSplitting;
 		}
 	}
 
@@ -49,7 +37,6 @@ console.log('Running tomzx Bot Launcher v' + VERSION + '!');
 	}
 
 	function pb() {
-
 		//UPDATE
 		if (window.botList == null) {
 			window.botList = [];
@@ -67,7 +54,7 @@ console.log('Running tomzx Bot Launcher v' + VERSION + '!');
 			text: "Human"
 		}).appendTo(bList);
 
-		ya = !0;
+		ya = true;
 		Pa();
 		setInterval(Pa, 18E4);
 
@@ -82,55 +69,63 @@ console.log('Running tomzx Bot Launcher v' + VERSION + '!');
 				var b = a.clientX - (5 + m / 5 / 2),
 					c = a.clientY - (5 + m / 5 / 2);
 				if (Math.sqrt(b * b + c * c) <= m / 5 / 2) {
-					V();
-					H(17);
+					sendMouseMove();
+					sentUint8(17);
 					return
 				}
 			}
 			fa = a.clientX;
 			ga = a.clientY;
-			Aa();
-			V()
+			mouseCoordinateChange();
+			sendMouseMove()
 		};
 		G.onmousemove = function(a) {
 			fa = a.clientX;
 			ga = a.clientY;
-			Aa()
+			mouseCoordinateChange()
 		};
 		G.onmouseup = function() {};
-		/firefox/i.test(navigator.userAgent) ? document.addEventListener("DOMMouseScroll", Ra, !1) : document.body.onmousewheel = Ra;
-		var a = !1,
-			b = !1,
-			c = !1;
+		/firefox/i.test(navigator.userAgent) ? document.addEventListener("DOMMouseScroll", Ra, false) : document.body.onmousewheel = Ra;
+		var a = false,
+			b = false,
+			c = false;
 		d.onkeydown = function(l) {
 			//UPDATE
 			if (!window.jQuery('#nick').is(":focus")) {
-				32 != l.keyCode || a || (V(), H(17), a = !0);
-				81 != l.keyCode || b || (H(18), b = !0);
-				87 != l.keyCode || c || (V(), H(21), c = !0);
-				27 == l.keyCode && Sa(!0)
+				// space
+				32 != l.keyCode || a || (sendMouseMove(), sentUint8(17), a = true);
+				// q
+				81 != l.keyCode || b || (sentUint8(18), b = true);
+				// w
+				87 != l.keyCode || c || (sendMouseMove(), sentUint8(21), c = true);
+				// esc
+				27 == l.keyCode && Sa(true)
 
 				//UPDATE
 				keyAction(l);
 			}
 		};
 		d.onkeyup = function(l) {
-			32 == l.keyCode && (a = !1);
-			87 == l.keyCode && (c = !1);
-			81 == l.keyCode && b && (H(19), b = !1)
+			// space
+			32 == l.keyCode && (a = false);
+			// wtq
+			87 == l.keyCode && (c = false);
+			// q
+			81 == l.keyCode && b && (sentUint8(19), b = false)
+			console.log('a = ' + a);
 		};
 		d.onblur = function() {
-			H(19);
-			c = b = a = !1
+			sentUint8(19);
+			c = b = a = false
 		};
 		d.onresize = Ta;
 		d.requestAnimationFrame(Ua);
-		setInterval(V, 40);
+		setInterval(sendMouseMove, 40);
 		y && e("#region").val(y);
 		Va();
 		ha(e("#region").val());
 		0 == Ba && y && I();
-		W = !0;
+		W = true;
 		e("#overlays").show();
 		Ta();
 		d.location.hash && 6 <= d.location.hash.length && Wa(d.location.hash)
@@ -164,7 +159,7 @@ console.log('Running tomzx Bot Launcher v' + VERSION + '!');
 		}
 	}
 
-	function Aa() {
+	function mouseCoordinateChange() {
 		//UPDATE
 		if (toggle || window.botList[botIndex][0] == "Human") {
 			ia = (fa - m / 2) / h + s;
@@ -194,17 +189,17 @@ console.log('Running tomzx Bot Launcher v' + VERSION + '!');
 	function Xa() {
 		e("#adsBottom").hide();
 		e("#overlays").hide();
-		W = !1;
+		W = false;
 		Va();
 		d.googletag && d.googletag.pubads && d.googletag.pubads().clear(d.aa)
 	}
 
 	function ha(a) {
-		a && a != y && (e("#region").val() != a && e("#region").val(a), y = d.localStorage.location = a, e(".region-message").hide(), e(".region-message." + a).show(), e(".btn-needs-server").prop("disabled", !1), ya && I())
+		a && a != y && (e("#region").val() != a && e("#region").val(a), y = d.localStorage.location = a, e(".region-message").hide(), e(".region-message." + a).show(), e(".btn-needs-server").prop("disabled", false), ya && I())
 	}
 
 	function Sa(a) {
-		W || (K = null, sb(), a && (x = 1), W = !0, e("#overlays").fadeIn(a ? 200 : 3E3))
+		W || (K = null, sb(), a && (x = 1), W = true, e("#overlays").fadeIn(a ? 200 : 3E3))
 	}
 
 	function Y(a) {
@@ -219,8 +214,8 @@ console.log('Running tomzx Bot Launcher v' + VERSION + '!');
 	}
 
 	function sb() {
-		la && (la = !1, setTimeout(function() {
-			la = !0
+		la && (la = false, setTimeout(function() {
+			la = true
 		}, 6E4 * Ya), d.googletag && d.googletag.pubads && d.googletag.pubads().refresh(d.aa))
 	}
 
@@ -240,8 +235,8 @@ console.log('Running tomzx Bot Launcher v' + VERSION + '!');
 			},
 			dataType: "text",
 			method: "POST",
-			cache: !1,
-			crossDomain: !0,
+			cache: false,
+			crossDomain: true,
 			data: (y + P || "?") + "\n154669603"
 		})
 	}
@@ -280,7 +275,7 @@ console.log('Running tomzx Bot Launcher v' + VERSION + '!');
 		F = [];
 		z = A = null;
 		R = 0;
-		$ = !1;
+		$ = false;
 		console.log("Connecting to " + a);
 		//UPDATE
 		serverIP = a;
@@ -291,11 +286,11 @@ console.log('Running tomzx Bot Launcher v' + VERSION + '!');
 			console.log("socket open");
 			a = N(5);
 			a.setUint8(0, 254);
-			a.setUint32(1, 4, !0);
+			a.setUint32(1, 4, true);
 			O(a);
 			a = N(5);
 			a.setUint8(0, 255);
-			a.setUint32(1, 154669603, !0);
+			a.setUint32(1, 154669603, true);
 			O(a);
 			a = N(1 + b.length);
 			a.setUint8(0, 80);
@@ -332,7 +327,7 @@ console.log('Running tomzx Bot Launcher v' + VERSION + '!');
 	function wb(a) {
 		function b() {
 			for (var b = "";;) {
-				var d = a.getUint16(c, !0);
+				var d = a.getUint16(c, true);
 				c += 2;
 				if (0 == d) break;
 				b += String.fromCharCode(d)
@@ -346,11 +341,11 @@ console.log('Running tomzx Bot Launcher v' + VERSION + '!');
 				xb(a, c);
 				break;
 			case 17:
-				aa = a.getFloat32(c, !0);
+				aa = a.getFloat32(c, true);
 				c += 4;
-				ba = a.getFloat32(c, !0);
+				ba = a.getFloat32(c, true);
 				c += 4;
-				ca = a.getFloat32(c, !0);
+				ca = a.getFloat32(c, true);
 				c += 4;
 				break;
 			case 20:
@@ -358,23 +353,23 @@ console.log('Running tomzx Bot Launcher v' + VERSION + '!');
 				M = [];
 				break;
 			case 21:
-				Ea = a.getInt16(c, !0);
+				Ea = a.getInt16(c, true);
 				c += 2;
-				Fa = a.getInt16(c, !0);
+				Fa = a.getInt16(c, true);
 				c += 2;
-				Ga || (Ga = !0, na = Ea, oa = Fa);
+				Ga || (Ga = true, na = Ea, oa = Fa);
 				break;
 			case 32:
-				M.push(a.getUint32(c, !0));
+				M.push(a.getUint32(c, true));
 				c += 4;
 				break;
 			case 49:
 				if (null != A) break;
-				var l = a.getUint32(c, !0),
+				var l = a.getUint32(c, true),
 					c = c + 4;
 				F = [];
 				for (var d = 0; d < l; ++d) {
-					var p = a.getUint32(c, !0),
+					var p = a.getUint32(c, true),
 						c = c + 4;
 					F.push({
 						id: p,
@@ -385,19 +380,19 @@ console.log('Running tomzx Bot Launcher v' + VERSION + '!');
 				break;
 			case 50:
 				A = [];
-				l = a.getUint32(c, !0);
+				l = a.getUint32(c, true);
 				c += 4;
-				for (d = 0; d < l; ++d) A.push(a.getFloat32(c, !0)), c += 4;
+				for (d = 0; d < l; ++d) A.push(a.getFloat32(c, true)), c += 4;
 				ab();
 				break;
 			case 64:
-				pa = a.getFloat64(c, !0);
+				pa = a.getFloat64(c, true);
 				c += 8;
-				qa = a.getFloat64(c, !0);
+				qa = a.getFloat64(c, true);
 				c += 8;
-				ra = a.getFloat64(c, !0);
+				ra = a.getFloat64(c, true);
 				c += 8;
-				sa = a.getFloat64(c, !0);
+				sa = a.getFloat64(c, true);
 				c += 8;
 				aa = (ra + pa) / 2;
 				ba = (sa + qa) / 2;
@@ -405,11 +400,11 @@ console.log('Running tomzx Bot Launcher v' + VERSION + '!');
 				0 == k.length && (s = aa, t = ba, h = ca);
 				break;
 			case 81:
-				var g = a.getUint32(c, !0),
+				var g = a.getUint32(c, true),
 					c = c + 4,
-					e = a.getUint32(c, !0),
+					e = a.getUint32(c, true),
 					c = c + 4,
-					f = a.getUint32(c, !0),
+					f = a.getUint32(c, true),
 					c = c + 4;
 				setTimeout(function() {
 					S({
@@ -423,28 +418,28 @@ console.log('Running tomzx Bot Launcher v' + VERSION + '!');
 
 	function xb(a, b) {
 		bb = C = Date.now();
-		$ || ($ = !0, e("#connecting").hide(), cb(), L && (L(), L = null));
+		$ || ($ = true, e("#connecting").hide(), cb(), L && (L(), L = null));
 		var c = Math.random();
-		Ha = !1;
-		var d = a.getUint16(b, !0);
+		Ha = false;
+		var d = a.getUint16(b, true);
 		b += 2;
 		for (var u = 0; u < d; ++u) {
-			var p = E[a.getUint32(b, !0)],
-				g = E[a.getUint32(b + 4, !0)];
+			var p = E[a.getUint32(b, true)],
+				g = E[a.getUint32(b + 4, true)];
 			b += 8;
 			p && g && (g.X(), g.s = g.x, g.t = g.y, g.r = g.size, g.J = p.x, g.K = p.y, g.q = g.size, g.Q =
 				C)
 		}
 		for (u = 0;;) {
-			d = a.getUint32(b, !0);
+			d = a.getUint32(b, true);
 			b += 4;
 			if (0 == d) break;
 			++u;
-			var f, p = a.getInt16(b, !0);
+			var f, p = a.getInt16(b, true);
 			b += 2;
-			g = a.getInt16(b, !0);
+			g = a.getInt16(b, true);
 			b += 2;
-			f = a.getInt16(b, !0);
+			f = a.getInt16(b, true);
 			b += 2;
 			for (var h = a.getUint8(b++), w = a.getUint8(b++), m = a.getUint8(b++), h = (h << 16 | w << 8 | m).toString(16); 6 > h.length;) h = "0" + h;
 			var h = "#" + h,
@@ -455,7 +450,7 @@ console.log('Running tomzx Bot Launcher v' + VERSION + '!');
 			w & 4 && (b += 8);
 			w & 8 && (b += 16);
 			for (var q, n = "";;) {
-				q = a.getUint16(b, !0);
+				q = a.getUint16(b, true);
 				b += 2;
 				if (0 == q) break;
 				n += String.fromCharCode(q)
@@ -492,11 +487,11 @@ console.log('Running tomzx Bot Launcher v' + VERSION + '!');
 			}
 		});
 
-		c = a.getUint32(b, !0);
+		c = a.getUint32(b, true);
 		b += 4;
-		for (u = 0; u < c; u++) d = a.getUint32(b, !0), b += 4, n = E[d], null != n && n.X();
+		for (u = 0; u < c; u++) d = a.getUint32(b, true), b += 4, n = E[d], null != n && n.X();
 		//UPDATE
-		//Ha && 0 == k.length && Sa(!1)
+		//Ha && 0 == k.length && Sa(false)
 	}
 
 	//UPDATE
@@ -558,8 +553,7 @@ console.log('Running tomzx Bot Launcher v' + VERSION + '!');
 		circles.push([x_1, y_1, radius, drawColor]);
 	}
 
-	function V() {
-
+	function sendMouseMove() {
 		//UPDATE
 		if (getPlayer().length == 0 && !reviving && ~~(getCurrentScore() / 100) > 0) {
 			console.log("Dead: " + ~~(getCurrentScore() / 100));
@@ -573,30 +567,29 @@ console.log('Running tomzx Bot Launcher v' + VERSION + '!');
 			reviving = false;
 		}
 
-		var a;
-		if (T()) {
-			a = fa - m / 2;
+		if (websocketIsOpen()) {
+			var a = fa - m / 2;
 			var b = ga - r / 2;
 			64 > a * a + b * b || .01 > Math.abs(eb - ia) && .01 > Math.abs(fb - ja) || (eb = ia, fb = ja, a = N(21), a.setUint8(0,
-				16), a.setFloat64(1, ia, !0), a.setFloat64(9, ja, !0), a.setUint32(17, 0, !0), O(a))
+				16), a.setFloat64(1, ia, true), a.setFloat64(9, ja, true), a.setUint32(17, 0, true), O(a))
 		}
 	}
 
 	function cb() {
-		if (T() && $ && null != K) {
+		if (websocketIsOpen() && $ && null != K) {
 			var a = N(1 + 2 * K.length);
 			a.setUint8(0, 0);
-			for (var b = 0; b < K.length; ++b) a.setUint16(1 + 2 * b, K.charCodeAt(b), !0);
+			for (var b = 0; b < K.length; ++b) a.setUint16(1 + 2 * b, K.charCodeAt(b), true);
 			O(a)
 		}
 	}
 
-	function T() {
+	function websocketIsOpen() {
 		return null != q && q.readyState == q.OPEN
 	}
 
-	function H(a) {
-		if (T()) {
+	function sentUint8(a) {
+		if (websocketIsOpen()) {
 			var b = N(1);
 			b.setUint8(0, a);
 			O(b)
@@ -604,7 +597,7 @@ console.log('Running tomzx Bot Launcher v' + VERSION + '!');
 	}
 
 	function $a() {
-		if (T() && null != B) {
+		if (websocketIsOpen() && null != B) {
 			var a = N(1 + B.length);
 			a.setUint8(0, 81);
 			for (var b = 0; b < B.length; ++b) a.setUint8(b + 1, B.charCodeAt(b));
@@ -647,7 +640,6 @@ console.log('Running tomzx Bot Launcher v' + VERSION + '!');
 		dText = [];
 		lines = [];
 
-
 		var a, b = Date.now();
 		++zb;
 		C = b;
@@ -662,7 +654,7 @@ console.log('Running tomzx Bot Launcher v' + VERSION + '!');
 			t = (t + c) / 2
 		} else s = (29 * s + aa) / 30, t = (29 * t + ba) / 30, h = (9 * h + ca * hb()) / 10;
 		qb();
-		Aa();
+		mouseCoordinateChange();
 		Ia || f.clearRect(0, 0, m, r);
 		Ia ? (f.fillStyle = ta ? "#111111" : "#F2FBFF", f.globalAlpha = .05, f.fillRect(0, 0, m, r), f.globalAlpha = 1) : Ab();
 		v.sort(function(a, b) {
@@ -676,7 +668,7 @@ console.log('Running tomzx Bot Launcher v' + VERSION + '!');
 		for (d = 0; d < Q.length; d++) Q[d].w(f);
 		//UPDATE
 		if (getPlayer().length > 0) {
-			var moveLoc = window.botList[botIndex][1](toggleFollow);
+			var moveLoc = window.botList[botIndex][1]({followMouse: toggleFollow, allowSplitting: toggleAllowSplitting});
 			if (!toggle) {
 				setPoint(moveLoc[0], moveLoc[1]);
 			}
@@ -702,7 +694,6 @@ console.log('Running tomzx Bot Launcher v' + VERSION + '!');
 		R = Math.max(R, Bb());
 
 		//UPDATE
-
 		var currentDate = new Date();
 
 		var nbSeconds = 0;
@@ -721,7 +712,7 @@ console.log('Running tomzx Bot Launcher v' + VERSION + '!');
 		b > 1E3 / 60 ? D -= .01 : b < 1E3 / 65 && (D += .01);.4 > D && (D = .4);
 		1 < D && (D = 1);
 		b = C - ib;
-		!T() || W ? (x += b / 2E3, 1 < x && (x = 1)) : (x -= b / 300, 0 > x && (x = 0));
+		!websocketIsOpen() || W ? (x += b / 2E3, 1 < x && (x = 1)) : (x -= b / 300, 0 > x && (x = 0));
 		0 < x && (f.fillStyle = "#000000", f.globalAlpha = .5 * x, f.fillRect(0, 0, m, r), f.globalAlpha = 1);
 		ib = C
 
@@ -878,18 +869,21 @@ console.log('Running tomzx Bot Launcher v' + VERSION + '!');
 		debugStrings.push("T - Bot: " + (!toggle ? "On" : "Off"));
 		debugStrings.push("R - Lines: " + (!toggleDraw ? "On" : "Off"));
 		debugStrings.push("Q - Follow Mouse: " + (toggleFollow ? "On" : "Off"));
+		debugStrings.push("S - Enable splitting: " + (toggleAllowSplitting ? "On" : "Off"));
 		debugStrings.push("");
 		debugStrings.push("Best Score: " + ~~(sessionScore / 100));
 		debugStrings.push("Best Time: " + bestTime + " seconds");
 		debugStrings.push("");
 		debugStrings.push(serverIP);
 
-		if (getPlayer().length > 0) {
+		var player = getPlayer();
+		for (var i = 0; i < player.length; ++i) {
+			var blob = player[i];
 			var offsetX = -getMapStartX();
 			var offsetY = -getMapStartY();
-			var player = getPlayer()[0];
-			debugStrings.push("Location: " + Math.floor(player.x + offsetX) + ", " + Math.floor(player.y + offsetY));
-			debugStrings.push("State: " + player.state);
+			debugStrings.push("Location: " + Math.floor(blob.x + offsetX) + ", " + Math.floor(blob.y + offsetY));
+			debugStrings.push("State: " + blob.state);
+			debugStrings.push("Can split: " + blob.canSplit + " (" + Math.round(blob.splitRatio*100, 0) + "%)");
 		}
 
 		var offsetValue = 20;
@@ -991,7 +985,7 @@ console.log('Running tomzx Bot Launcher v' + VERSION + '!');
 						a.beginPath();
 						a.moveTo(100, 140);
 						a.arc(100,
-							140, 80, c, d, !1);
+							140, 80, c, d, false);
 						a.fill();
 						c = d
 					}
@@ -1123,8 +1117,8 @@ console.log('Running tomzx Bot Launcher v' + VERSION + '!');
 				},
 				dataType: "text",
 				method: "POST",
-				cache: !1,
-				crossDomain: !0,
+				cache: false,
+				crossDomain: true,
 				data: B
 			}) : e.ajax("https://m.agar.io/facebookLogin", {
 				error: function() {
@@ -1134,8 +1128,8 @@ console.log('Running tomzx Bot Launcher v' + VERSION + '!');
 				success: Eb,
 				dataType: "text",
 				method: "POST",
-				cache: !1,
-				crossDomain: !0,
+				cache: false,
+				crossDomain: true,
 				data: b
 			})
 		}
@@ -1160,8 +1154,8 @@ console.log('Running tomzx Bot Launcher v' + VERSION + '!');
 			},
 			dataType: "text",
 			method: "POST",
-			cache: !1,
-			crossDomain: !0,
+			cache: false,
+			crossDomain: true,
 			data: a
 		})
 	}
@@ -1187,6 +1181,7 @@ console.log('Running tomzx Bot Launcher v' + VERSION + '!');
 				toggle = false,
 				toggleDraw = false,
 				toggleFollow = false,
+				toggleAllowSplitting = false,
 				tempPoint = [0, 0, 1],
 				dPoints = [],
 				circles = [],
@@ -1227,20 +1222,20 @@ console.log('Running tomzx Bot Launcher v' + VERSION + '!');
 				sa = 1E4,
 				h = 1,
 				y = null,
-				kb = !0,
-				wa = !0,
-				Oa = !1,
-				Ha = !1,
+				kb = true,
+				wa = true,
+				Oa = false,
+				Ha = false,
 				R = 0,
-				ta = !1,
-				lb = !1,
+				ta = false,
+				lb = false,
 				aa = s = ~~((pa + ra) / 2),
 				ba = t = ~~((qa + sa) / 2),
 				ca = 1,
 				P = "",
 				A = null,
-				ya = !1,
-				Ga = !1,
+				ya = false,
+				Ga = false,
 				Ea = 0,
 				Fa =
 				0,
@@ -1248,13 +1243,13 @@ console.log('Running tomzx Bot Launcher v' + VERSION + '!');
 				oa = 0,
 				mb = 0,
 				Db = ["#333333", "#FF3333", "#33FF33", "#3333FF"],
-				Ia = !1,
-				$ = !1,
+				Ia = false,
+				$ = false,
 				bb = 0,
 				B = null,
 				J = 1,
 				x = 1,
-				W = !0,
+				W = true,
 				Ba = 0,
 				Da = {};
 			(function() {
@@ -1303,7 +1298,7 @@ console.log('Running tomzx Bot Launcher v' + VERSION + '!');
 				};
 				d.spectate = function() {
 					K = null;
-					H(1);
+					sentUint8(1);
 					Xa()
 				};
 				d.setGameMode = function(a) {
@@ -1323,10 +1318,10 @@ console.log('Running tomzx Bot Launcher v' + VERSION + '!');
 				d.ga && d.ga("send", "event", "User-Agent", d.navigator.userAgent, {
 					nonInteraction: 1
 				});
-				var la = !1,
+				var la = false,
 					Ya = 0;
 				setTimeout(function() {
-					la = !0
+					la = true
 				}, Math.max(6E4 * Ya, 1E4));
 				var ea = {
 						AF: "JP-Tokyo",
@@ -1721,7 +1716,7 @@ console.log('Running tomzx Bot Launcher v' + VERSION + '!');
 							d.requestAnimationFrame(Ua);
 							var c = Date.now(),
 								l = c - a;
-							l > b && (a = c - l % b, !T() || 240 > Date.now() - bb ? gb() : console.warn("Skipping draw"), Fb())
+							l > b && (a = c - l % b, !websocketIsOpen() || 240 > Date.now() - bb ? gb() : console.warn("Skipping draw"), Fb())
 						}
 					}(),
 					U = {},
@@ -1754,10 +1749,10 @@ console.log('Running tomzx Bot Launcher v' + VERSION + '!');
 					Q: 0,
 					sa: 0,
 					ia: 0,
-					G: !1,
-					h: !1,
-					n: !1,
-					R: !0,
+					G: false,
+					h: false,
+					n: false,
+					R: true,
 					Y: 0,
 					//UPDATE
 					updateCode: 0,
@@ -1767,7 +1762,7 @@ console.log('Running tomzx Bot Launcher v' + VERSION + '!');
 						return this.h;
 					},
 					isPlayer: function() {
-						return this.name !== '' && this.size > 12;
+						return this.name !== '' && this.size >= 12;
 					},
 					isFood: function() {
 						return this.size < 12;
@@ -1783,9 +1778,9 @@ console.log('Running tomzx Bot Launcher v' + VERSION + '!');
 								break
 							}
 						delete E[this.id];
-						a = k.indexOf(this); - 1 != a && (Ha = !0, k.splice(a, 1));
+						a = k.indexOf(this); - 1 != a && (Ha = true, k.splice(a, 1));
 						a = M.indexOf(this.id); - 1 != a && M.splice(a, 1);
-						this.G = !0;
+						this.G = true;
 						0 < this.Y && Q.push(this)
 					},
 					l: function() {
@@ -1793,7 +1788,7 @@ console.log('Running tomzx Bot Launcher v' + VERSION + '!');
 					},
 					B: function(a) {
 						if (this.name = a) null ==
-							this.o ? this.o = new TextElement(this.l(), "#FFFFFF", !0, "#000000") : this.o.M(this.l()), this.o.C(this.name)
+							this.o ? this.o = new TextElement(this.l(), "#FFFFFF", true, "#000000") : this.o.M(this.l()), this.o.C(this.name)
 					},
 					W: function() {
 						for (var a = this.I(); this.a.length > a;) {
@@ -1828,14 +1823,14 @@ console.log('Running tomzx Bot Launcher v' + VERSION + '!');
 								d = a[(c - 1 + b) % b].i,
 								e = a[(c + 1) % b].i;
 							if (15 < this.size && null != X && 20 < this.size * h && 0 < this.id) {
-								var k = !1,
+								var k = false,
 									w = a[c].x,
 									m = a[c].y;
 								X.ra(w - 5, m - 5, 10, 10, function(a) {
 									a.V != p && 25 > (w -
-										a.x) * (w - a.x) + (m - a.y) * (m - a.y) && (k = !0)
+										a.x) * (w - a.x) + (m - a.y) * (m - a.y) && (k = true)
 								});
-								!k && (a[c].x < pa || a[c].y < qa || a[c].x > ra || a[c].y > sa) && (k = !0);
+								!k && (a[c].x < pa || a[c].y < qa || a[c].x > ra || a[c].y > sa) && (k = true);
 								k && (0 < a[c].b && (a[c].b = 0), a[c].b -= 1)
 							}
 							f += a[c].b;
@@ -1866,13 +1861,13 @@ console.log('Running tomzx Bot Launcher v' + VERSION + '!');
 						return b
 					},
 					N: function() {
-						return 0 >= this.id ? !0 : this.x + this.size + 40 < s - m / 2 / h || this.y + this.size + 40 < t - r / 2 / h || this.x - this.size - 40 > s + m / 2 / h || this.y - this.size - 40 > t + r / 2 / h ? !1 : !0
+						return 0 >= this.id ? true : this.x + this.size + 40 < s - m / 2 / h || this.y + this.size + 40 < t - r / 2 / h || this.x - this.size - 40 > s + m / 2 / h || this.y - this.size - 40 > t + r / 2 / h ? false : true
 					},
 					w: function(a) {
 						if (this.N()) {
 							++this.Y;
 							var b = 0 < this.id && !this.h && !this.n && .4 > h;
-							5 > this.I() && (b = !0);
+							5 > this.I() && (b = true);
 							if (this.R && !b)
 								for (var c = 0; c < this.a.length; c++) this.a[c].i = this.size;
 							this.R = b;
@@ -1885,7 +1880,7 @@ console.log('Running tomzx Bot Launcher v' + VERSION + '!');
 							a.lineCap = "round";
 							a.lineJoin = this.h ? "miter" : "round";
 							Oa ? (a.fillStyle = "#FFFFFF", a.strokeStyle = "#AAAAAA") : (a.fillStyle = this.color, a.strokeStyle = this.color);
-							if (b) a.beginPath(), a.arc(this.x, this.y, this.size + 5, 0, 2 * Math.PI, !1);
+							if (b) a.beginPath(), a.arc(this.x, this.y, this.size + 5, 0, 2 * Math.PI, false);
 							else {
 								this.qa();
 								a.beginPath();
@@ -1900,7 +1895,7 @@ console.log('Running tomzx Bot Launcher v' + VERSION + '!');
 							d = this.name.toLowerCase();
 							!this.n && kb && ":teams" != P ? -1 != ob.indexOf(d) ? (U.hasOwnProperty(d) || (U[d] = new Image, U[d].src = "skins/" +
 								d + ".png"), c = 0 != U[d].width && U[d].complete ? U[d] : null) : c = null : c = null;
-							c = (e = c) ? -1 != Hb.indexOf(d) : !1;
+							c = (e = c) ? -1 != Hb.indexOf(d) : false;
 							b || a.stroke();
 							a.fill();
 							null == e || c || (a.save(), a.clip(), a.drawImage(e, this.x - this.size, this.y - this.size, 2 * this.size, 2 * this.size), a.restore());
@@ -1922,7 +1917,7 @@ console.log('Running tomzx Bot Launcher v' + VERSION + '!');
 								a.drawImage(e, ~~this.x - ~~(p / 2), b - ~~(g / 2), p, g);
 								b += e.height / 2 / d + 4
 							}
-							0 < this.id && lb && (c || 0 == k.length && (!this.h || this.n) && 20 < this.size) && (null == this.O && (this.O = new TextElement(this.l() / 2, "#FFFFFF", !0, "#000000")), c = this.O, c.M(this.l() / 2), c.C(~~(this.size * this.size / 100)), d = Math.ceil(10 * h) / 10, c.ea(d), e = c.L(), p = ~~(e.width / d), g = ~~(e.height / d), a.drawImage(e, ~~this.x - ~~(p / 2),
+							0 < this.id && lb && (c || 0 == k.length && (!this.h || this.n) && 20 < this.size) && (null == this.O && (this.O = new TextElement(this.l() / 2, "#FFFFFF", true, "#000000")), c = this.O, c.M(this.l() / 2), c.C(~~(this.size * this.size / 100)), d = Math.ceil(10 * h) / 10, c.ea(d), e = c.L(), p = ~~(e.width / d), g = ~~(e.height / d), a.drawImage(e, ~~this.x - ~~(p / 2),
 								b - ~~(g / 2), p, g));
 							a.restore()
 						}
@@ -1931,29 +1926,29 @@ console.log('Running tomzx Bot Launcher v' + VERSION + '!');
 				TextElement.prototype = {
 					F: "",
 					S: "#000000",
-					U: !1,
+					U: false,
 					v: "#000000",
 					u: 16,
 					p: null,
 					T: null,
-					k: !1,
+					k: false,
 					D: 1,
 					M: function(a) {
-						this.u != a && (this.u = a, this.k = !0)
+						this.u != a && (this.u = a, this.k = true)
 					},
 					ea: function(a) {
-						this.D != a && (this.D = a, this.k = !0)
+						this.D != a && (this.D = a, this.k = true)
 					},
 					setStrokeColor: function(a) {
-						this.v != a && (this.v = a, this.k = !0)
+						this.v != a && (this.v = a, this.k = true)
 					},
 					C: function(a) {
-						a != this.F && (this.F = a, this.k = !0)
+						a != this.F && (this.F = a, this.k = true)
 					},
 					L: function() {
 						null == this.p && (this.p = document.createElement("canvas"), this.T = this.p.getContext("2d"));
 						if (this.k) {
-							this.k = !1;
+							this.k = false;
 							var a = this.p,
 								b = this.T,
 								c = this.F,
@@ -2013,16 +2008,16 @@ console.log('Running tomzx Bot Launcher v' + VERSION + '!');
 								H: function(a) {
 									for (var b = 0; b < this.items.length; ++b) {
 										var c = this.items[b];
-										if (c.x >= a.x && c.y >= a.y && c.x < a.x + a.j && c.y < a.y + a.g) return !0
+										if (c.x >= a.x && c.y >= a.y && c.x < a.x + a.j && c.y < a.y + a.g) return true
 									}
 									if (0 !=
 										this.c.length) {
 										var d = this;
 										return this.$(a, function(b) {
-											return d.c[b].H(a)
+											return d.c[b].sentUint8(a)
 										})
 									}
-									return !1
+									return false
 								},
 								A: function(a, b) {
 									for (var c = 0; c < this.items.length; ++c) b(this.items[c]);
@@ -2041,7 +2036,7 @@ console.log('Running tomzx Bot Launcher v' + VERSION + '!');
 								},
 								$: function(a, b) {
 									return a.x < this.x + this.j / 2 &&
-										(a.y < this.y + this.g / 2 && b(0) || a.y >= this.y + this.g / 2 && b(2)) || a.x >= this.x + this.j / 2 && (a.y < this.y + this.g / 2 && b(1) || a.y >= this.y + this.g / 2 && b(3)) ? !0 : !1
+										(a.y < this.y + this.g / 2 && b(0) || a.y >= this.y + this.g / 2 && b(2)) || a.x >= this.x + this.j / 2 && (a.y < this.y + this.g / 2 && b(1) || a.y >= this.y + this.g / 2 && b(3)) ? true : false
 								},
 								ha: function() {
 									var a = this.depth + 1,
@@ -2084,7 +2079,7 @@ console.log('Running tomzx Bot Launcher v' + VERSION + '!');
 									this.root.A(e, f)
 								},
 								H: function(a) {
-									return this.root.H(a)
+									return this.root.sentUint8(a)
 								},
 								clear: function() {
 									this.root.clear()
@@ -2108,7 +2103,7 @@ console.log('Running tomzx Bot Launcher v' + VERSION + '!');
 							a.w(c);
 							c.restore();
 							var d = document.getElementById("favicon"),
-								e = d.cloneNode(!0);
+								e = d.cloneNode(true);
 							e.setAttribute("href", b.toDataURL("image/png"));
 							d.parentNode.replaceChild(e, d)
 						}
@@ -2134,9 +2129,9 @@ console.log('Running tomzx Bot Launcher v' + VERSION + '!');
 						}
 						d.FB.init({
 							appId: "677505792353827",
-							cookie: !0,
-							xfbml: !0,
-							status: !0,
+							cookie: true,
+							xfbml: true,
+							status: true,
 							version: "v2.2"
 						});
 						d.FB.Event.subscribe("auth.statusChange", function(b) {
@@ -2215,4 +2210,6 @@ console.log('Running tomzx Bot Launcher v' + VERSION + '!');
 			}
 		}
 	}
+
+	return module;
 })(window, jQuery);
